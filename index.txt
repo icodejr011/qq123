@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>陽春打地鼠遊戲</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+  }
+  h1 {
+    margin-bottom: 20px;
+  }
+  .score {
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-gap: 15px;
+  }
+  .hole {
+    width: 100px;
+    height: 100px;
+    background-color: #a0522d;
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .mole {
+    width: 80px;
+    height: 80px;
+    background-color: #ffcc00;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -80px;
+    left: 10px;
+    transition: bottom 0.3s;
+  }
+  .mole.up {
+    bottom: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>打地鼠</h1>
+<div class="score">分數: <span id="score">0</span></div>
+<div class="game-grid">
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+</div>
+
+<script>
+const holes = document.querySelectorAll('.hole');
+const moles = document.querySelectorAll('.mole');
+const scoreBoard = document.getElementById('score');
+let lastHole;
+let score = 0;
+let timeUp = false;
+
+function randomTime(min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+
+function randomHole(holes) {
+  const idx = Math.floor(Math.random() * holes.length);
+  const hole = holes[idx];
+  if(hole === lastHole) {
+    return randomHole(holes);
+  }
+  lastHole = hole;
+  return hole;
+}
+
+function peep() {
+  const time = randomTime(500, 1200);
+  const hole = randomHole(holes);
+  const mole = hole.querySelector('.mole');
+  mole.classList.add('up');
+  setTimeout(() => {
+    mole.classList.remove('up');
+    if(!timeUp) peep();
+  }, time);
+}
+
+function startGame() {
+  score = 0;
+  scoreBoard.textContent = score;
+  timeUp = false;
+  peep();
+  setTimeout(() => timeUp = true, 15000); // 15秒遊戲
+}
+
+moles.forEach(mole => {
+  mole.addEventListener('click', e => {
+    if(!e.isTrusted) return; // 防止作弊
+    score++;
+    scoreBoard.textContent = score;
+    mole.classList.remove('up');
+  });
+});
+
+// 自動開始遊戲
+startGame();
+</script>
+
+</body>
+</html>
